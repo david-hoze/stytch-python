@@ -26,7 +26,11 @@ class ClientBase(abc.ABC):
 
         fraud_base_url = "https://telemetry.stytch.com"
         if fraud_environment is not None:
-            fraud_base_url = fraud_environment
+            if not fraud_environment.startswith("https://"):
+                raise ValueError("fraud_environment must use HTTPS scheme")
+            fraud_base_url = (
+                fraud_environment if fraud_environment.endswith("/") else fraud_environment + "/"
+            )
         self.api_base = ApiBase(base_url)
         self.fraud_api_base = ApiBase(fraud_base_url)
         self.sync_client = SyncClient(project_id, secret)
@@ -76,4 +80,9 @@ class ClientBase(abc.ABC):
         elif env == "live":
             return "https://api.stytch.com/"
 
+        # Custom environment URL - must use HTTPS to prevent SSRF and credential leakage
+        if not env.startswith("https://"):
+            raise ValueError("custom environment URL must use HTTPS scheme")
+        if not env.endswith("/"):
+            env = env + "/"
         return env
