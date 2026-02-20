@@ -26,6 +26,8 @@ class ClientBase(abc.ABC):
 
         fraud_base_url = "https://telemetry.stytch.com"
         if fraud_environment is not None:
+            if not fraud_environment.startswith("https://"):
+                raise ValueError("fraud_environment must use the HTTPS scheme")
             fraud_base_url = fraud_environment
         self.api_base = ApiBase(base_url)
         self.fraud_api_base = ApiBase(fraud_base_url)
@@ -76,4 +78,10 @@ class ClientBase(abc.ABC):
         elif env == "live":
             return "https://api.stytch.com/"
 
+        if not env.startswith("https://"):
+            raise ValueError(
+                "environment must be 'test', 'live', or a custom URL using the HTTPS scheme"
+            )
+        if not env.endswith("/"):
+            env = env + "/"
         return env

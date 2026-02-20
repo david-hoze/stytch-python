@@ -146,12 +146,26 @@ class ResolveApiUrl(TestCase):
 
     def test_resolve_api_url_requires_https(self):
         """Test that custom_base_url must use HTTPS scheme."""
-        # Arrange
         non_https_url = "http://custom.api.example.com"
 
-        # Act & Assert
         with self.assertRaises(ValueError) as context:
             ClientBase._resolve_api_url("project-test-123", None, non_https_url)
 
-        # Verify the error message
         self.assertIn("HTTPS scheme", str(context.exception))
+
+    def test_resolve_api_url_environment_requires_https(self):
+        """Test that a custom environment URL must use HTTPS scheme."""
+        non_https_env = "http://custom.api.example.com/"
+
+        with self.assertRaises(ValueError) as context:
+            ClientBase._resolve_api_url("project-test-123", non_https_env, None)
+
+        self.assertIn("HTTPS scheme", str(context.exception))
+
+    def test_resolve_api_url_environment_custom_https_accepted(self):
+        """Test that a custom HTTPS environment URL is accepted and gets trailing slash."""
+        custom_env = "https://custom.stytch.example.com"
+
+        result = ClientBase._resolve_api_url("project-test-123", custom_env, None)
+
+        self.assertEqual(result, "https://custom.stytch.example.com/")
