@@ -53,9 +53,10 @@ setup(
     package_data={"stytch": ["py.typed"]},
     include_package_data=True,
     install_requires=[
-        "aiohttp>=3.8.3",
-        "requests>=2.7.0",
-        "pydantic>=1.10.2",
+        # Tighten lower bounds to avoid known-vulnerable releases (OSV/PyPI advisories).
+        "aiohttp>=3.13.3",
+        "requests>=2.32.5",
+        "pydantic>=2.6.4",
         "pyjwt[crypto]>=2.9.0",
     ],
 )
